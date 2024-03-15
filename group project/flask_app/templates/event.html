@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Add Event</title>
+    
+    <!-- CSS FILES -->        
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;400;700&display=swap" rel="stylesheet">        
+    <link href="../static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../static/css/bootstrap-icons.css" rel="stylesheet">
+    <link href="../static/css/templatemo-festava-live.css" rel="stylesheet">
+
+    <style>
+        /* Custom Form Styles */
+        .form-container {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container label {
+            font-weight: bold;
+        }
+
+        .form-container input[type="text"],
+        .form-container textarea,
+        .form-container input[type="date"],
+        .form-container input[type="time"],
+        .form-container input[type="number"],
+        .form-container input[type="file"],
+        .form-container button[type="submit"] {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        .form-container textarea {
+            resize: vertical;
+        }
+
+        .form-container button[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .form-container button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        .form-container .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-container .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-container .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Comment Container Styles */
+        .comment-container {
+            background-color: #f0f0f0; /* Light gray background */
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px; /* Add space between comments */
+        }
+
+        .comment-container .comment p:first-child {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        /* Smaller Event Container */
+        .event-container {
+            padding: 10px;
+            margin-bottom: 20px;
+            width: 320px;
+            margin: 0 auto; /* Center horizontally */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center vertically */
+        }
+    </style>
+</head>
+
+<body>
+
+    <main>
+        <header class="site-header">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 col-12 d-flex flex-wrap">
+                        <p class="d-flex me-4 mb-0">
+                            <i class="bi-person custom-icon me-2"></i>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <a class="navbar-brand" href="index.html">Albania Events</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav align-items-lg-center ms-auto me-lg-5">
+                        <li class="nav-item">
+                            <a class="nav-link click-scroll" href="/dashboard">Home</a>
+                        </li>
+                    </ul>
+                    <a href="/buy/ticket" class="btn custom-btn d-lg-block d-none">Buy Ticket</a>
+                </div>
+            </div>
+        </nav>
+
+        <section class="ticket-section section-padding">
+            <div class="container">
+                <div class="card event-container">
+                    <div class="card-body">
+                        <h5 class="card-title">Titulli: {{event.title}}</h5>
+                        <p class="card-text">Pershkrimi: {{event.description}}</p>
+                        <p class="card-text">Organizuar nga: {{event.firstName}} {{event.lastName}}</p>
+                        <p class="card-text">Vendndodhja: {{event.location}}</p>
+                        <p class="card-text">Cmimi: {{event.price}}</p>
+                        <img height="250px" width="260px" src="../static/images/{{event.image_upload}}" alt="img">
+                    </div>
+                </div>
+        
+                <h5 class="text-center mt-3">Komentet e pjesemarresave</h5>
+                <form action="/comments/add/{{event.id}}" method="post" class="w-100 mb-3">
+                    <label for="komenti">Shkruani mendimin tuaj</label>
+                    <textarea name="komenti" cols="30" class="form-control" rows="3"></textarea>
+                    <button class="btn btn-success mt-2">Dergo</button>
+                    {% with messages = get_flashed_messages(category_filter=["komenti"]) %}
+                    {% if messages %}
+                        {% for message in messages %}
+                        <p class="text-danger text-center">{{ message }}</p>
+                        {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+                </form>
+        
+                <div class="comments-container">
+                    {% for komenti in event.comments %}
+                    <div class="comment-container">
+                        <div class="comment">
+                            <p>{{komenti.firstName}} {{komenti.lastName}} on {{komenti.created_at}}:</p>
+                            <p>{{komenti.komenti}}</p>
+                            {% if komenti.user_id == loggedUser['id'] %}
+                            <a href="/delete/comment/{{komenti.id}}">Fshij</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <!-- Footer content here -->
+</footer>
+
+<!-- JAVASCRIPT FILES -->        
+<script src="../static/js/jquery.min.js"></script>
+<script src="../static/js/bootstrap.min.js"></script>
+<script src="../static/js/jquery.sticky.js"></script>
+<script src="../static/js/click-scroll.js"></script>
+<script src="../static/js/custom.js"></script>
+
+</body>
+</html>
